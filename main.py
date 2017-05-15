@@ -10,18 +10,18 @@ from model import *
 
 # Hyper Parameters
 sequence_length = 1
-input_size = 214
+input_size = 254
 output_size = 1
-hidden_size= 100
-num_layers=1
+hidden_size= 200
+num_layers=3
 num_classes=1
 num_epochs = 5
 batch_size = 1000
-learning_rate = 0.01
+learning_rate = 0.001
 
 print('..loading data')
 #datas,labels=load_svmlight_file('data//data_embeding.libsvm')
-datas=pd.read_csv('data//data_embeding.csv')
+datas=pd.read_csv('data//nomalize_data_embeding.csv')
 print('DataShape: '+str(datas.shape))
 labels=datas['Intensity'].values
 peptide=datas['Peptide'].values
@@ -39,7 +39,7 @@ test_label=labels[split_dot:]
 
 test_peptide=test_data.Peptide.values
 test_idx=test_data.Number.values
-print(test_idx)
+#print(test_idx)
 #peptide=datas[:,1].toarray()
 
 person_list=[]
@@ -71,7 +71,7 @@ def get_split_list(array_list):
     list=[]
     for m in array_list:
         for n in range(len(merge_list[0][m])):
-            list.append((merge_list[0][m][n][0]-1).astype(int))
+            list.append(int(merge_list[0][m][n][0]-1))
     return list
 print('..batch the peptide in training data')
 idx=[x for x in range(len(merge_list[0]))]
@@ -100,7 +100,10 @@ for epoch in range(num_epochs):
 
         
         prediction,h_state= model(train,h_state)
-
+        preddd=prediction.data.numpy()
+        blds=label.data.numpy()
+        sadf=pd.DataFrame({"label":blds.reshape(1,len(blds[0]))[0],"pred":preddd.reshape(1,len(preddd[0]))[0]})
+        sadf.to_csv('data//123.csv')
         #print(h_state)
         #print(h_state.data)
         h_state=Variable(h_state.data)
@@ -119,7 +122,7 @@ print('..predicting')
 
 test_data=torch.FloatTensor(test_data)
 test_data=Variable(test_data[np.newaxis,:])
-test_output,h_state=model(test_data,h_states)
+test_output,h_state=model(test_data,h_state)
 test_output=test_output.data.numpy()
 
 pred=pd.DataFrame({"Number":test_idx,"Peptide":test_peptide,"Intensity":test_output.reshape(1,len(test_output[0]))[0]})

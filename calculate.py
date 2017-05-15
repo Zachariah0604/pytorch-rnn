@@ -28,7 +28,7 @@ def get_merge_list(data):
     temp_peptide = ''
     temp_list = []
     intensity_list = []
-    for row in data.itertuples():
+    for index,row in data.iterrows():
         peptide = row.Peptide
         if peptide != temp_peptide:
             if temp_peptide == '':
